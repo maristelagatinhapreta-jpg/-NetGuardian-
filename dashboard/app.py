@@ -1,85 +1,33 @@
-from flask import Flask
+from flask import Flask, render_template, jsonify
 import socket
 import platform
+import psutil
 
 app = Flask(__name__)
-
 
 @app.route("/")
 def home():
 
     hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
 
-    try:
-        ip = socket.gethostbyname(hostname)
-    except:
-        ip = "Não encontrado"
+    return render_template(
+        "index.html",
+        hostname=hostname,
+        ip=ip,
+        sistema=platform.system(),
+        versao=platform.release()
+    )
 
-    sistema = platform.system()
-    versao = platform.release()
+@app.route("/dados")
+def dados():
 
-    return f"""
-    <html>
-    <head>
-        <title>NetGuardian</title>
+    rede = psutil.net_io_counters()
 
-        <style>
-
-            body {{
-                background-color: #0f172a;
-                color: white;
-                font-family: Arial, sans-serif;
-                text-align: center;
-                padding-top: 80px;
-            }}
-
-            .card {{
-                background-color: #1e293b;
-                width: 600px;
-                margin: auto;
-                padding: 25px;
-                border-radius: 15px;
-                box-shadow: 0px 0px 15px rgba(0,0,0,0.5);
-            }}
-
-            h1 {{
-                color: #38bdf8;
-            }}
-
-            hr {{
-                border: 1px solid #475569;
-            }}
-
-        </style>
-
-    </head>
-
-    <body>
-
-        <div class="card">
-
-            <h1>🛡️ NetGuardian</h1>
-
-            <h2>Sistema de Monitoramento de Rede</h2>
-
-            <p>Status: Online ✅</p>
-
-            <hr>
-
-            <p><b>Computador:</b> {hostname}</p>
-
-            <p><b>IP:</b> {ip}</p>
-
-            <p><b>Sistema:</b> {sistema}</p>
-
-            <p><b>Versão:</b> {versao}</p>
-
-        </div>
-
-    </body>
-    </html>
-    """
-
+    return jsonify({
+        "enviados": round(rede.bytes_sent / 1024 / 1024, 2),
+        "recebidos": round(rede.bytes_recv / 1024 / 1024, 2)
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
