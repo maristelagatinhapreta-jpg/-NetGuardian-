@@ -1,33 +1,71 @@
-from flask import Flask, render_template, jsonify
-import socket
-import platform
-import psutil
+<hr>
 
-app = Flask(__name__)
+<h3>📊 Tráfego de Rede em Tempo Real</h3>
 
-@app.route("/")
-def home():
+<canvas id="grafico" width="700" height="300"></canvas>
 
-    hostname = socket.gethostname()
-    ip = socket.gethostbyname(hostname)
+https://cdn.jsdelivr.net/npm/chart.jsscript>
 
-    return render_template(
-        "index.html",
-        hostname=hostname,
-        ip=ip,
-        sistema=platform.system(),
-        versao=platform.release()
-    )
+<script>
 
-@app.route("/dados")
-def dados():
+const ctx = document.getElementById('grafico').getContext('2d');
 
-    rede = psutil.net_io_counters()
+const grafico = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [
+            {
+                label: 'Enviados (MB)',
+                borderColor: '#22c55e',
+                data: []
+            },
+            {
+                label: 'Recebidos (MB)',
+                borderColor: '#38bdf8',
+                data: []
+            }
+        ]
+    },
+    options: {
+        responsive: true
+    }
+});
 
-    return jsonify({
-        "enviados": round(rede.bytes_sent / 1024 / 1024, 2),
-        "recebidos": round(rede.bytes_recv / 1024 / 1024, 2)
-    })
+function atualizarGrafico() {
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    fetch('/dados')
+
+    .then(response => response.json())
+
+    .then(data => {
+
+        const hora = new Date().toLocaleTimeString();
+
+        grafico.data.labels.push(hora);
+
+        grafico.data.datasets[0].data.push(data.enviados);
+
+        grafico.data.datasets[1].data.push(data.recebidos);
+
+        if (grafico.data.labels.length > 10) {
+
+            grafico.data.labels.shift();
+
+            grafico.data.datasets[0].data.shift();
+
+            grafico.data.datasets[1].data.shift();
+
+        }
+
+        grafico.update();
+
+    });
+
+}
+
+setInterval(atualizarGrafico, 3000);
+
+atualizarGrafico();
+
+</script>
