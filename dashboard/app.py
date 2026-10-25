@@ -1,71 +1,30 @@
-<hr>
+from flask import Flask, jsonify, render_template
+import socket
+import platform
+import psutil
 
-<h3>📊 Tráfego de Rede em Tempo Real</h3>
+app = Flask(__name__)
 
-<canvas id="grafico" width="700" height="300"></canvas>
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-https://cdn.jsdelivr.net/npm/chart.jsscript>
+@app.route("/dados")
+def dados():
+    net = psutil.net_io_counters()
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    sistema = platform.system()
+    versao = platform.release()
 
-<script>
+    return jsonify({
+        "hostname": hostname,
+        "ip": ip,
+        "sistema_operacional": sistema,
+        "versao": versao,
+        "enviados": round(net.bytes_sent / (1024 * 1024), 2),
+        "recebidos": round(net.bytes_recv / (1024 * 1024), 2),
+    })
 
-const ctx = document.getElementById('grafico').getContext('2d');
-
-const grafico = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [
-            {
-                label: 'Enviados (MB)',
-                borderColor: '#22c55e',
-                data: []
-            },
-            {
-                label: 'Recebidos (MB)',
-                borderColor: '#38bdf8',
-                data: []
-            }
-        ]
-    },
-    options: {
-        responsive: true
-    }
-});
-
-function atualizarGrafico() {
-
-    fetch('/dados')
-
-    .then(response => response.json())
-
-    .then(data => {
-
-        const hora = new Date().toLocaleTimeString();
-
-        grafico.data.labels.push(hora);
-
-        grafico.data.datasets[0].data.push(data.enviados);
-
-        grafico.data.datasets[1].data.push(data.recebidos);
-
-        if (grafico.data.labels.length > 10) {
-
-            grafico.data.labels.shift();
-
-            grafico.data.datasets[0].data.shift();
-
-            grafico.data.datasets[1].data.shift();
-
-        }
-
-        grafico.update();
-
-    });
-
-}
-
-setInterval(atualizarGrafico, 3000);
-
-atualizarGrafico();
-
-</script>
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
