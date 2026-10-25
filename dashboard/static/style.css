@@ -1,1 +1,53 @@
 
+mkdir -p dashboard/static dashboard/templates
+cat > dashboard/static/style.css <<'EOF'
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: #e2e8f0;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.card span {
+    display: block;
+    color: #94a3b8;
+    margin-bottom: 8px;
+}
+
+.card strong {
+    font-size: 1.2rem;
+}
+
+.chart-box {
+    background: #111827;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #334155;
+}
+EOF
