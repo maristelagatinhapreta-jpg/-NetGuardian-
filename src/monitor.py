@@ -1,11 +1,9 @@
 import psutil
 
 
-stats = psutil.net_io_counters()
-
-print("\n=== NETGUARDIAN ===\n")
-
-print(f"Bytes enviados  : {stats.bytes_sent}")
-print(f"Bytes recebidos : {stats.bytes_recv}")
-
-print("\nMonitor concluído.")
+def get_network_stats():
+    stats = psutil.net_io_counters()
+    return {
+        "bytes_sent": stats.bytes_sent,
+        "bytes_recv": stats.bytes_recv,
+    }
