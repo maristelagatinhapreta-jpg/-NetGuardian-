@@ -1,56 +1,33 @@
-const ctx = document.getElementById('grafico').getContext('2d');
+from flask import Flask, jsonify, render_template
+import socket
+import platform
+import psutil
 
-const chart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [
-            {
-                label: 'Enviados (MB)',
-                borderColor: '#22c55e',
-                data: [],
-            },
-            {
-                label: 'Recebidos (MB)',
-                borderColor: '#38bdf8',
-                data: [],
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: false
-            }
-        }
-    }
-});
+app = Flask(__name__)
 
-function carregarDados() {
-    fetch('/dados')
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('hostname').textContent = data.hostname;
-            document.getElementById('ip').textContent = data.ip;
-            document.getElementById('sistema').textContent = data.sistema_operacional;
-            document.getElementById('versao').textContent = data.versao;
 
-            const hora = new Date().toLocaleTimeString();
-            chart.data.labels.push(hora);
-            chart.data.datasets[0].data.push(data.enviados);
-            chart.data.datasets[1].data.push(data.recebidos);
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-            if (chart.data.labels.length > 12) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
-                chart.data.datasets[1].data.shift();
-            }
 
-            chart.update();
-        })
-        .catch(error => console.error('Erro ao buscar dados:', error));
-}
+@app.route("/dados")
+def dados():
+    net = psutil.net_io_counters()
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    sistema = platform.system()
+    versao = platform.release()
 
-setInterval(carregarDados, 3000);
-carregarDados();
+    return jsonify({
+        "hostname": hostname,
+        "ip": ip,
+        "sistema_operacional": sistema,
+        "versao": versao,
+        "enviados": round(net.bytes_sent / (1024 * 1024), 2),
+        "recebidos": round(net.bytes_recv / (1024 * 1024), 2),
+    })
+
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
