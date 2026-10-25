@@ -5,11 +5,9 @@ import psutil
 
 app = Flask(__name__)
 
-
 @app.route("/")
 def index():
     return render_template("index.html")
-
 
 @app.route("/dados")
 def dados():
@@ -28,6 +26,5 @@ def dados():
         "recebidos": round(net.bytes_recv / (1024 * 1024), 2),
     })
 
-
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
