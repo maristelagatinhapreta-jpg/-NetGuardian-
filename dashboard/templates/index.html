@@ -1,109 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NetGuardian</title>
-
-    <style>
-        body {
-            background: #071330;
-            font-family: Arial, sans-serif;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 900px;
-            margin: 50px auto;
-        }
-
-        .card {
-            background: #1b2942;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0px 0px 15px rgba(0, 0, 0, .5);
-        }
-
-        h1 {
-            color: #38bdf8;
-        }
-
-        hr {
-            border: 1px solid #475569;
-        }
-
-        .status {
-            color: #22c55e;
-            font-weight: bold;
-        }
-
-        .box {
-            display: inline-block;
-            width: 220px;
-            margin: 10px;
-            padding: 15px;
-            background: #0f172a;
-            border-radius: 10px;
-        }
-
-        .numero {
-            font-size: 22px;
-            color: #38bdf8;
-            font-weight: bold;
-        }
-    </style>
-
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
-
     <div class="container">
+        <h1>NetGuardian</h1>
 
-        <div class="card">
-
-            <h1>🛡️ NetGuardian</h1>
-
-            <h2>Sistema de Monitoramento de Rede</h2>
-
-            <p class="status">Status: Online ✅</p>
-
-            <hr>
-
-            <p><strong>Computador:</strong> {{ hostname }}</p>
-
-            <p><strong>IP:</strong> {{ ip }}</p>
-
-            <p><strong>Sistema:</strong> {{ sistema }}</p>
-
-            <p><strong>Versão:</strong> {{ versao }}</p>
-
-            <hr>
-
-            <h3>📊 Estatísticas de Rede</h3>
-
-            <div class="box">
-
-                <h4>⬆️ Enviados</h4>
-
-                <p class="numero">{{ enviados }} MB</p>
-
+        <div class="cards">
+            <div class="card">
+                <span>Hostname</span>
+                <strong id="hostname">Carregando...</strong>
             </div>
-
-            <div class="box">
-
-                <h4>⬇️ Recebidos</h4>
-
-                <p class="numero">{{ recebidos }} MB</p>
-
+            <div class="card">
+                <span>IP Local</span>
+                <strong id="ip">Carregando...</strong>
             </div>
-
+            <div class="card">
+                <span>Sistema</span>
+                <strong id="sistema">Carregando...</strong>
+            </div>
+            <div class="card">
+                <span>Versão</span>
+                <strong id="versao">Carregando...</strong>
+            </div>
         </div>
 
+        <div class="chart-box">
+            <h2>Tráfego de Rede</h2>
+            <canvas id="grafico" width="800" height="300"></canvas>
+        </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
-
 </html>
+        
